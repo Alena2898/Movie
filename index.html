@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Киноафиша Kazan</title>
+    <title>Киноафиша</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,8 +12,21 @@
         <h1>🍿 Киноафиша</h1>
         <p>Лучшие фильмы этой недели</p>
         <input type="text" id="search" placeholder="Поиск по названию...">
+        <div class="cart-container">
+            <button id="cartBtn"> Корзина (<span id="cartCount">0</span>)</button>
+        </div>
     </header>
     <div class="movies-container" id="movies"></div>
+    
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2> Ваша корзина</h2>
+            <div id="cartItems"></div>
+            <button id="clearCart" class="clear-btn">Очистить корзину</button>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
