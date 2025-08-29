@@ -1,4 +1,4 @@
-const movies =[
+const movies = [
     {
         id: 1,
         title: "Интерстеллар",
@@ -21,7 +21,7 @@ const movies =[
         actors: ["Марлон Брандо", "Аль Пачино", "Джеймс Каан", "Роберт Дюваль"],
         genre: ["Криминал", "Драма"],
         rating: 9.2,
-        votes:  1920000
+        votes: 1920000
     },
     {
         id: 3,
@@ -42,7 +42,7 @@ const movies =[
         description: "История простого человека, который невольно меняет ход истории США.",
         year: 1994,
         director: "Роберт Земекис",
-        actors: ["Том Хэнкс", "Робин Райт", "Гэри Синиз", "Салли Филд"],
+        actors: ["Том Хэнks", "Робин Райт", "Гэри Синиз", "Салли Филд"],
         genre: ["Драма", "Романтика"],
         rating: 8.8,
         votes: 2100000
@@ -90,7 +90,7 @@ const movies =[
         description: "Любовная история на фоне крушения легендарного лайнера.",
         year: 1997,
         director: "Джеймс Кэмерон",
-        actors: ["Леонардо ДиКаприо", "Кейт Уинслет", "Билли Зейн", "Кэти Бейтс"],
+        actors: ["Леонардо ДиКаприo", "Кейт Уинслет", "Билли Зейн", "Кэти Бейтс"],
         genre: ["Драма", "Романтика"],
         rating: 7.9,
         votes: 1250000
@@ -133,14 +133,14 @@ const movies =[
     },
     {
         id: 12,
-    title: "Как приручить дракона",
-    poster: "https://m.media-amazon.com/images/M/MV5BMjA5NDQyMjc2NF5BMl5BanBnXkFtZTcwMjg5ODcyMw@@._V1_FMjpg_UX1000_.jpg",
-    description: "История дружбы мальчика Иккинга и дракона Беззубика, которая меняет жизнь всей деревни викингов.",
-    year: 2010,
-    director: "Дин ДеБлуа, Крис Сандерс",
-    actors: ["Джей Барушель", "Джерард Батлер", "Крэйг Фергюсон", "Америка Феррера"],
-    genre: ["Мультфильм", "Приключения", "Семейный"],
-    rating: 8.1,
+        title: "Как приручить дракона",
+        poster: "https://m.media-amazon.com/images/M/MV5BMjA5NDQyMjc2NF5BMl5BanBnXkFtZTcwMjg5ODcyMw@@._V1_FMjpg_UX1000_.jpg",
+        description: "История дружбы мальчика Иккинга и дракона Беззубика, которая меняет жизнь всей деревни викингов.",
+        year: 2010,
+        director: "Дин ДеБлуа, Крис Сандерс",
+        actors: ["Джей Барушель", "Джерард Батлер", "Крэйг Фергюсон", "Америка Феррера"],
+        genre: ["Мультфильм", "Приключения", "Семейный"],
+        rating: 8.1,
         votes: 760000
     },
     {
@@ -222,7 +222,7 @@ const movies =[
         description: "Молодой львёнок Симба познаёт истинный смысл ответственности и чести.",
         year: 1994,
         director: "Роджер Аллерс",
-        actors: ["Мэттью Бродерик", "Джереми Айронс", "Джеймс Эрл Джонс", "Вупи Голдберг"],
+        actors: ["Мэттью Бродерик", "Джереми Айронс", "Джеймс Эрл Джон스", "Вупи Голдберг"],
         genre: ["Мультфильм", "Мюзикл", "Драма"],
         rating: 8.5,
         votes: 1100000
@@ -238,11 +238,12 @@ const movies =[
         genre: ["Триллер", "Детектив", "Драма"],
         rating: 8.2,
         votes: 1450000
+    }
+];
 
-    ];
 class Cart {
     constructor() {
-       this.items = this.loadCart();
+        this.items = this.loadCart();
         this.updateCartCount();
     }
 
@@ -381,8 +382,11 @@ function showCartModal() {
             
             document.querySelectorAll('.remove-from-cart').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    cart.removeFromCart(parseInt(btn.dataset.id));
+                    const movieId = parseInt(btn.dataset.id);
+                    cart.removeFromCart(movieId);
                     showCartModal();
+                    
+                    updateCartButtons(movieId, false);
                 });
             });
         }
@@ -391,18 +395,42 @@ function showCartModal() {
     modal.style.display = 'block';
 }
 
+function updateCartButtons(movieId, isInCart) {
+    const buttons = document.querySelectorAll(`.add-to-cart-btn[data-id="${movieId}"]`);
+    buttons.forEach(btn => {
+        if (isInCart) {
+            btn.textContent = '✓ В корзине';
+            btn.classList.add('added');
+        } else {
+            btn.textContent = '➕ В корзину';
+            btn.classList.remove('added');
+        }
+    });
+}
+
 function renderMovies(moviesToRender) {
     const moviesContainer = document.getElementById('movies');
+    if (!moviesContainer) return;
+    
     moviesContainer.innerHTML = '';
+    
+    if (moviesToRender.length === 0) {
+        moviesContainer.innerHTML = '<div class="no-results">Фильмы не найдены</div>';
+        return;
+    }
     
     moviesToRender.forEach(movie => {
         const isInCart = cart.isInCart(movie.id);
         const movieEl = document.createElement('div');
         movieEl.className = 'movie';
         movieEl.innerHTML = `
-            <img src="${movie.poster}" alt="${movie.title}">
+            <img src="${movie.poster}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/280x400/2c3e50/ffffff?text=No+Image'">
             <h2>${movie.title}</h2>
-            <p>${movie.description}</p>
+            <div class="movie-meta">
+                <span class="year">${movie.year}</span>
+                <span class="genre">${movie.genre.join(', ')}</span>
+            </div>
+            <p>${movie.description.substring(0, 100)}...</p>
             <div class="rating">
                 <span class="rating-value">★ ${movie.rating}</span>
                 <span> (${movie.votes.toLocaleString()} оценок)</span>
@@ -424,7 +452,12 @@ function renderMovies(moviesToRender) {
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const movieId = parseInt(btn.dataset.id);
-            if (cart.addToCart(movieId)) {
+            if (cart.isInCart(movieId)) {
+                cart.removeFromCart(movieId);
+                btn.textContent = '➕ В корзину';
+                btn.classList.remove('added');
+            } else {
+                cart.addToCart(movieId);
                 btn.textContent = '✓ В корзине';
                 btn.classList.add('added');
             }
@@ -432,22 +465,81 @@ function renderMovies(moviesToRender) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initMainPage() {
     const moviesContainer = document.getElementById('movies');
     const searchInput = document.getElementById('search');
+    const genreButtons = document.querySelectorAll('.filter-btn');
+    const sortSelect = document.getElementById('sortSelect');
     
     if (moviesContainer && searchInput) {
-        function handleSearch() {
-            const term = searchInput.value.toLowerCase();
-            const filtered = movies.filter(movie => 
-                movie.title.toLowerCase().includes(term)
-            );
+        let currentFilter = 'all';
+        let currentSort = 'default';
+        let searchTerm = '';
+        
+        function filterAndSortMovies() {
+            let filtered = movies;
+            
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(movie => 
+                    movie.genre.some(g => g.toLowerCase() === currentFilter.toLowerCase())
+                );
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(movie => 
+                    movie.title.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            switch(currentSort) {
+                case 'rating-desc':
+                    filtered.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'rating-asc':
+                    filtered.sort((a, b) => a.rating - b.rating);
+                    break;
+                case 'title':
+                    filtered.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+                case 'year-desc':
+                    filtered.sort((a, b) => b.year - a.year);
+                    break;
+                case 'year-asc':
+                    filtered.sort((a, b) => a.year - b.year);
+                    break;
+            }
+            
             renderMovies(filtered);
         }
-
-        searchInput.addEventListener('input', handleSearch);
-        renderMovies(movies);
+        
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value.toLowerCase();
+            filterAndSortMovies();
+        });
+        
+        genreButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                genreButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                filterAndSortMovies();
+            });
+        });
+        
+        sortSelect.addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            filterAndSortMovies();
+        });
+        
+        filterAndSortMovies();
     }
-    
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     setupModal();
+    
+    if (document.getElementById('movies')) {
+
+        initMainPage();
+    }
 });
