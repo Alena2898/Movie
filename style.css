@@ -312,3 +312,241 @@ h1 {
     flex-direction: column;
     gap: 10px;
 }
+.filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin: 25px 0;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-group h3 {
+    color: white;
+    margin: 0;
+    font-size: 16px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.genre-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 500px;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: #e50914;
+    color: white;
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+}
+
+.sort-select {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.sort-select option {
+    background: #2c3e50;
+    color: white;
+}
+
+.movie-meta {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.year {
+    font-weight: bold;
+    color: #e50914;
+}
+
+.genre {
+    font-style: italic;
+    color: #555;
+}
+
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: white;
+    font-size: 18px;
+    grid-column: 1 / -1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 20px;
+    backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+    .filters-container {
+        flex-direction: column;
+        gap: 20px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .genre-buttons {
+        max-width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .filter-btn {
+        font-size: 12px;
+        padding: 6px 12px;
+        white-space: nowrap;
+    }
+    
+    .sort-select {
+        width: 100%;
+        max-width: 250px;
+    }
+}
+
+.movie {
+    position: relative;
+}
+
+.movie .rating {
+    margin: 10px 0;
+}
+
+.movie .rating-value {
+    font-size: 16px;
+    color: #ffc107;
+}
+
+.movie img {
+    background: linear-gradient(45deg, #2c3e50, #4a5d6e);
+}
+
+.filter-btn:active {
+    transform: translateY(0);
+}
+
+.sort-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.5);
+}
+
+.sort-select option:checked {
+    background: #e50914;
+    color: white;
+}
+
+.movies-container {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #e50914;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+    .filters-container {
+        padding: 10px;
+    }
+    
+    .filter-group h3 {
+        font-size: 14px;
+    }
+    
+    .filter-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+    
+    .sort-select {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    
+    .movie-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+.genre-buttons::-webkit-scrollbar {
+    height: 4px;
+}
+
+.genre-buttons::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.genre-buttons::-webkit-scrollbar-thumb {
+    background: #e50914;
+    border-radius: 2px;
+}
+
+.genre-buttons::-webkit-scrollbar-thumb:hover {
+    background: #b2070f;
+}
