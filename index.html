@@ -12,16 +12,49 @@
         <h1>🍿 Киноафиша</h1>
         <p>Лучшие фильмы этой недели</p>
         <input type="text" id="search" placeholder="Поиск по названию...">
+        
+        <div class="filters-container">
+            <div class="filter-group">
+                <h3>Жанры:</h3>
+                <div class="genre-buttons">
+                    <button class="filter-btn active" data-filter="all">Все</button>
+                    <button class="filter-btn" data-filter="фантастика">Фантастика</button>
+                    <button class="filter-btn" data-filter="боевик">Боевик</button>
+                    <button class="filter-btn" data-filter="драма">Драма</button>
+                    <button class="filter-btn" data-filter="комедия">Комедия</button>
+                    <button class="filter-btn" data-filter="триллер">Триллер</button>
+                    <button class="filter-btn" data-filter="криминал">Криминал</button>
+                    <button class="filter-btn" data-filter="приключения">Приключения</button>
+                    <button class="filter-btn" data-filter="мультфильм">Мультфильм</button>
+                    <button class="filter-btn" data-filter="биография">Биография</button>
+                    <button class="filter-btn" data-filter="исторический">Исторический</button>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <h3>Сортировка:</h3>
+                <select id="sortSelect" class="sort-select">
+                    <option value="default">По умолчанию</option>
+                    <option value="rating-desc">По рейтингу (убыв.)</option>
+                    <option value="rating-asc">По рейтингу (возр.)</option>
+                    <option value="title">По названию (А-Я)</option>
+                    <option value="year-desc">По году (новые)</option>
+                    <option value="year-asc">По году (старые)</option>
+                </select>
+            </div>
+        </div>
+
         <div class="cart-container">
-            <button id="cartBtn"> Корзина (<span id="cartCount">0</span>)</button>
+            <button id="cartBtn">Корзина (<span id="cartCount">0</span>)</button>
         </div>
     </header>
+    
     <div class="movies-container" id="movies"></div>
     
     <div id="cartModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2> Ваша корзина</h2>
+            <h2>Ваша корзина</h2>
             <div id="cartItems"></div>
             <button id="clearCart" class="clear-btn">Очистить корзину</button>
         </div>

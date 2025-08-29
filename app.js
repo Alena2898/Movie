@@ -1,4 +1,4 @@
-const movies = [
+const movies =[
     {
         id: 1,
         title: "Интерстеллар",
@@ -238,12 +238,11 @@ const movies = [
         genre: ["Триллер", "Детектив", "Драма"],
         rating: 8.2,
         votes: 1450000
-    }
-];
 
+    ];
 class Cart {
     constructor() {
-        this.items = this.loadCart();
+       this.items = this.loadCart();
         this.updateCartCount();
     }
 
