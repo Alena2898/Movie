@@ -1,5 +1,8 @@
+const API_KEY = '9ec22f9'; 
+const BASE_URL = 'http://www.omdbapi.com/';
+
 const movies = [
-    {
+  {
         id: 1,
         title: "Интерстеллар",
         poster: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_FMjpg_UX1000_.jpg",
@@ -329,6 +332,79 @@ class RatingSystem {
 const cart = new Cart();
 const ratingSystem = new RatingSystem();
 
+async function searchMovies(query) {
+    try {
+        const url = `${BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(query)}&type=movie`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.Response === 'True') {
+        
+            const detailedMovies = await Promise.all(
+                data.Search.slice(0, 10).map(async (movie) => {
+                    return await getMovieDetails(movie.imdbID);
+                })
+            );
+            return detailedMovies.filter(movie => movie !== null);
+        } else {
+            return [];
+        }
+    } catch (error) {
+        console.error('Ошибка поиска фильмов:', error);
+        throw new Error('Сервер недоступен. Попробуйте позже.');
+    }
+}
+
+async function getMovieDetails(imdbID) {
+    try {
+        const url = `${BASE_URL}?apikey=${API_KEY}&i=${imdbID}&plot=full`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.Response === 'True') {
+            return {
+                id: data.imdbID,
+                title: data.Title,
+                poster: data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/300x450/2c3e50/ffffff?text=No+Image',
+                description: data.Plot,
+                year: parseInt(data.Year) || new Date().getFullYear(),
+                director: data.Director,
+                actors: data.Actors ? data.Actors.split(', ') : [],
+                genre: data.Genre ? data.Genre.split(', ') : [],
+                rating: parseFloat(data.imdbRating) || 0,
+                votes: parseInt(data.imdbVotes?.replace(/,/g, '')) || 0
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Ошибка загрузки деталей фильма:', error);
+        return null;
+    }
+}
+
+async function getPopularMovies() {
+    try {
+        
+        const popularQueries = ['avengers', 'batman', 'star wars', 'harry potter', 'lord of the rings'];
+        const randomQuery = popularQueries[Math.floor(Math.random() * popularQueries.length)];
+        
+        return await searchMovies(randomQuery);
+    } catch (error) {
+        console.error('Ошибка загрузки популярных фильмов:', error);
+        return [];
+    }
+}
+
 function setupModal() {
     const modal = document.getElementById('cartModal');
     const cartBtn = document.getElementById('cartBtn');
@@ -382,10 +458,9 @@ function showCartModal() {
             
             document.querySelectorAll('.remove-from-cart').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const movieId = parseInt(btn.dataset.id);
+                    const movieId = btn.dataset.id;
                     cart.removeFromCart(movieId);
                     showCartModal();
-                    
                     updateCartButtons(movieId, false);
                 });
             });
@@ -430,15 +505,17 @@ function renderMovies(moviesToRender) {
                 <span class="year">${movie.year}</span>
                 <span class="genre">${movie.genre.join(', ')}</span>
             </div>
-            <p>${movie.description.substring(0, 100)}...</p>
+            <p>${movie.description ? movie.description.substring(0, 100) + '...' : 'Описание отсутствует'}</p>
             <div class="rating">
-                <span class="rating-value">★ ${movie.rating}</span>
-                <span> (${movie.votes.toLocaleString()} оценок)</span>
+                <span class="rating-value">★ ${movie.rating || 'N/A'}</span>
+                <span> (${movie.votes ? movie.votes.toLocaleString() : 0} оценок)</span>
             </div>
-            <button class="details-btn" data-id="${movie.id}">Подробнее</button>
-            <button class="add-to-cart-btn ${isInCart ? 'added' : ''}" data-id="${movie.id}">
-                ${isInCart ? '✓ В корзине' : '➕ В корзину'}
-            </button>
+            <div class="movie-actions">
+                <button class="details-btn" data-id="${movie.id}">Подробнее</button>
+                <button class="add-to-cart-btn ${isInCart ? 'added' : ''}" data-id="${movie.id}">
+                    ${isInCart ? '✓ В корзине' : '➕ В корзину'}
+                </button>
+            </div>
         `;
         moviesContainer.appendChild(movieEl);
     });
@@ -451,7 +528,7 @@ function renderMovies(moviesToRender) {
 
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const movieId = parseInt(btn.dataset.id);
+            const movieId = btn.dataset.id;
             if (cart.isInCart(movieId)) {
                 cart.removeFromCart(movieId);
                 btn.textContent = '➕ В корзину';
@@ -465,7 +542,7 @@ function renderMovies(moviesToRender) {
     });
 }
 
-function initMainPage() {
+async function initMainPage() {
     const moviesContainer = document.getElementById('movies');
     const searchInput = document.getElementById('search');
     const genreButtons = document.querySelectorAll('.filter-btn');
@@ -475,46 +552,128 @@ function initMainPage() {
         let currentFilter = 'all';
         let currentSort = 'default';
         let searchTerm = '';
+        let allMovies = [];
+        
+        
+        moviesContainer.innerHTML = `
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Загрузка фильмов...</p>
+            </div>
+        `;
+        
+        try {
+            
+            allMovies = await getPopularMovies();
+            
+            
+            if (allMovies.length === 0) {
+                allMovies = movies;
+            }
+            
+            filterAndSortMovies();
+        } catch (error) {
+            console.error('Ошибка загрузки фильмов:', error);
+            
+            allMovies = movies;
+            filterAndSortMovies();
+            
+            
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'error-message';
+            errorMessage.innerHTML = `
+                <p>Упс! Сервер недоступен. Используем локальную базу фильмов.</p>
+            `;
+            moviesContainer.parentNode.insertBefore(errorMessage, moviesContainer);
+        }
         
         function filterAndSortMovies() {
-            let filtered = movies;
+            let filtered = [...allMovies];
             
             if (currentFilter !== 'all') {
                 filtered = filtered.filter(movie => 
-                    movie.genre.some(g => g.toLowerCase() === currentFilter.toLowerCase())
+                    movie.genre && movie.genre.some(g => 
+                        g.toLowerCase().includes(currentFilter.toLowerCase())
+                    )
                 );
             }
             
             if (searchTerm) {
                 filtered = filtered.filter(movie => 
-                    movie.title.toLowerCase().includes(searchTerm)
+                    movie.title && movie.title.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
             
             switch(currentSort) {
                 case 'rating-desc':
-                    filtered.sort((a, b) => b.rating - a.rating);
+                    filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
                     break;
                 case 'rating-asc':
-                    filtered.sort((a, b) => a.rating - b.rating);
+                    filtered.sort((a, b) => (a.rating || 0) - (b.rating || 0));
                     break;
                 case 'title':
                     filtered.sort((a, b) => a.title.localeCompare(b.title));
                     break;
                 case 'year-desc':
-                    filtered.sort((a, b) => b.year - a.year);
+                    filtered.sort((a, b) => (b.year || 0) - (a.year || 0));
                     break;
                 case 'year-asc':
-                    filtered.sort((a, b) => a.year - b.year);
+                    filtered.sort((a, b) => (a.year || 0) - (b.year || 0));
                     break;
             }
             
             renderMovies(filtered);
         }
         
+    
+        let searchTimeout;
         searchInput.addEventListener('input', (e) => {
-            searchTerm = e.target.value.toLowerCase();
-            filterAndSortMovies();
+            clearTimeout(searchTimeout);
+            searchTerm = e.target.value.trim();
+            
+            if (searchTerm.length > 2) {
+                moviesContainer.innerHTML = `
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <p class="loading-text">Поиск...</p>
+                    </div>
+                `;
+                
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const searchResults = await searchMovies(searchTerm);
+                        allMovies = searchResults.length > 0 ? searchResults : movies;
+                        filterAndSortMovies();
+                    } catch (error) {
+                        console.error('Ошибка поиска:', error);
+                        allMovies = movies;
+                        filterAndSortMovies();
+                        
+                        const errorMessage = document.createElement('div');
+                        errorMessage.className = 'error-message';
+                        errorMessage.innerHTML = `<p>Ошибка поиска: ${error.message}</p>`;
+                        moviesContainer.parentNode.insertBefore(errorMessage, moviesContainer);
+                    }
+                }, 500);
+            } else if (searchTerm.length === 0) {
+                searchTimeout = setTimeout(async () => {
+                    moviesContainer.innerHTML = `
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                            <p class="loading-text">Загрузка...</p>
+                        </div>
+                    `;
+                    
+                    try {
+                        allMovies = await getPopularMovies();
+                        if (allMovies.length === 0) allMovies = movies;
+                        filterAndSortMovies();
+                    } catch (error) {
+                        allMovies = movies;
+                        filterAndSortMovies();
+                    }
+                }, 300);
+            }
         });
         
         genreButtons.forEach(btn => {
@@ -530,8 +689,6 @@ function initMainPage() {
             currentSort = e.target.value;
             filterAndSortMovies();
         });
-        
-        filterAndSortMovies();
     }
 }
 
@@ -539,7 +696,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupModal();
     
     if (document.getElementById('movies')) {
-
         initMainPage();
     }
 });
