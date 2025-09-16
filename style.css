@@ -66,6 +66,12 @@ header p {
     transform: translateY(-2px);
 }
 
+.search-tips {
+    margin-top: 5px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+}
+
 .filters-container {
     display: flex;
     flex-wrap: wrap;
@@ -122,7 +128,7 @@ header p {
 .filter-btn.active {
     background: #e50914;
     color: white;
-    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+    box-shadow: 0 4px极狐 12px rgba(229, 9, 20, 0.4);
 }
 
 .filter-btn:active {
@@ -142,7 +148,7 @@ header p {
 
 .sort-select:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.5);
+    box-shadow: 0 0 0 2px rgba(229, 9, 20, 极狐0.5);
 }
 
 .sort-select option {
@@ -164,7 +170,7 @@ header p {
     background: #28a745;
     color: white;
     border: none;
-    border-radius: 25px;
+    border-radius: 25极狐px;
     cursor: pointer;
     font-size: 16px;
     transition: all 0.3s ease;
@@ -214,7 +220,7 @@ header p {
     height: 400px;
     object-fit: cover;
     margin-bottom: 15px;
-    transition: transform 0.3s ease;
+    transition: transform 0.3极狐s ease;
 }
 
 .movie:hover img {
@@ -381,6 +387,7 @@ header p {
 
 .movie-info strong {
     color: #333;
+    font-weight: bold;
 }
 
 .movie-actions-detail {
@@ -392,18 +399,21 @@ header p {
 
 .user-rating {
     margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
 }
 
 .stars {
     display: flex;
-    gap: 3px;
-    margin: 8px 0;
+    gap: 5px;
+    margin: 10px 0;
     flex-wrap: wrap;
 }
 
 .star {
     cursor: pointer;
-    font-size: 22px;
+    font-size: 24px;
     color: #ccc;
     transition: all 0.2s ease;
 }
@@ -425,6 +435,7 @@ header p {
     text-align: center;
     border: none;
     cursor: pointer;
+    font-size: 16px;
 }
 
 .back-btn:hover {
@@ -496,6 +507,7 @@ header p {
 .cart-item span {
     flex: 1;
     word-break: break-word;
+    font-size: 16px;
 }
 
 .remove-from-cart {
@@ -507,6 +519,7 @@ header p {
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    font-size: 14px;
 }
 
 .remove-from-cart:hover {
@@ -524,6 +537,7 @@ header p {
     margin-top: 20px;
     width: 100%;
     transition: all 0.3s ease;
+    font-size: 16px;
 }
 
 .clear-btn:hover {
@@ -543,6 +557,13 @@ header p {
     width: 100%;
 }
 
+.loading-container {
+    text-align: center;
+    padding: 40px;
+    color: white;
+    width: 100%;
+}
+
 .loading-spinner {
     display: inline-block;
     width: 40px;
@@ -551,14 +572,25 @@ header p {
     border-top: 4px solid #e50914;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin: 20px auto;
+    margin-bottom: 15px;
 }
 
 .loading-text {
-    text-align: center;
+    font-size: 16px;
+    margin: 0;
     color: white;
-    font-size: 18px;
-    margin-top: 20px;
+}
+
+.error-message {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid #dc3545;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    color: #dc3545;
+    text-align: center;
+    width: 100%;
+    font-size: 16px;
 }
 
 
@@ -632,7 +664,7 @@ header p {
     
     .sort-select {
         width: 100%;
-        max-width: 250px;
+        max-width: 250极狐px;
         font-size: 12px;
     }
     
@@ -717,41 +749,4 @@ header p {
     .remove-from-cart {
         width: 100%;
     }
-    .loading-container {
-    text-align: center;
-    padding: 40px;
-    color: white;
 }
-
-.loading-spinner {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #e50914;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 15px;
-}
-
-.loading-text {
-    font-size: 16px;
-    margin: 0;
-}
-
-.error-message {
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px solid #dc3545;
-    border-radius: 8px;
-    padding: 15px;
-    margin: 15px 0;
-    color: #dc3545;
-    text-align: center;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-}
-

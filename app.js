@@ -1,248 +1,10 @@
 const API_KEY = '9ec22f9'; 
-const BASE_URL = 'http://www.omdbapi.com/';
+const BASE_URL = 'https://www.omdbapi.com/'; 
 
-const movies = [
-  {
-        id: 1,
-        title: "Интерстеллар",
-        poster: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_FMjpg_UX1000_.jpg",
-        description: "Фантастический эпос о путешествии через червоточину в поисках нового дома для человечества.",
-        year: 2014,
-        director: "Кристофер Нолан",
-        actors: ["Мэттью Макконахи", "Энн Хэтэуэй", "Джессика Честейн", "Майкл Кейн"],
-        genre: ["Фантастика", "Драма", "Приключения"],
-        rating: 8.6,
-        votes: 1890000
-    },
-    {
-        id: 2,
-        title: "Крёстный отец",
-        poster: "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg",
-        description: "Классика гангстерского кино о семье Корлеоне и их криминальной империи.",
-        year: 1972,
-        director: "Фрэнсис Форд Коппола",
-        actors: ["Марлон Брандо", "Аль Пачино", "Джеймс Каан", "Роберт Дюваль"],
-        genre: ["Криминал", "Драма"],
-        rating: 9.2,
-        votes: 1920000
-    },
-    {
-        id: 3,
-        title: "Тёмный рыцарь",
-        poster: "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_FMjpg_UX1000_.jpg",
-        description: "Бэтмен сражается с хаосом, который сеёт Джокер в Готэме.",
-        year: 2008,
-        director: "Кристофер Нолан",
-        actors: ["Кристиан Бэйл", "Хит Леджер", "Аарон Экхарт", "Мэгги Джилленхол"],
-        genre: ["Боевик", "Криминал", "Драма"],
-        rating: 9.0,
-        votes: 2700000
-    },
-    {
-        id: 4,
-        title: "Форрест Гамп",
-        poster: "https://m.media-amazon.com/images/M/MV5BNWIwODRlZTUtY2U3ZS00Yzg1LWJhNzYtMmZiYmEyNmU1NjMzXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_FMjpg_UX1000_.jpg",
-        description: "История простого человека, который невольно меняет ход истории США.",
-        year: 1994,
-        director: "Роберт Земекис",
-        actors: ["Том Хэнks", "Робин Райт", "Гэри Синиз", "Салли Филд"],
-        genre: ["Драма", "Романтика"],
-        rating: 8.8,
-        votes: 2100000
-    },
-    {
-        id: 5,
-        title: "Побег из Шоушенка",
-        poster: "https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_FMjpg_UX1000_.jpg",
-        description: "Драма о надежде и дружбе в тюремных стенах.",
-        year: 1994,
-        director: "Фрэнк Дарабонт",
-        actors: ["Тим Роббинс", "Морган Фриман", "Боб Гантон", "Уильям Сэдлер"],
-        genre: ["Драма"],
-        rating: 9.3,
-        votes: 2800000
-    },
-    {
-        id: 6,
-        title: "Начало",
-        poster: "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_FMjpg_UX1000_.jpg",
-        description: "Группа специалистов по внедрению в сны выполняет сложнейшую миссию.",
-        year: 2010,
-        director: "Кристофер Нолан",
-        actors: ["Леонардо ДиКаприо", "Джозеф Гордон-Левитт", "Эллен Пейдж", "Том Харди"],
-        genre: ["Фантастика", "Боевик", "Триллер"],
-        rating: 8.8,
-        votes: 2400000
-    },
-    {
-        id: 7,
-        title: "Матрица",
-        poster: "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_FMjpg_UX1000_.jpg",
-        description: "Хакер Нео узнаёт, что реальность — это иллюзия, созданная машинами.",
-        year: 1999,
-        director: "Лана и Лилли Вачовски",
-        actors: ["Киану Ривз", "Лоренс Фишберн", "Кэрри-Энн Мосс", "Хьюго Уивинг"],
-        genre: ["Фантастика", "Боевик"],
-        rating: 8.7,
-        votes: 1980000
-    },
-    {
-        id: 8,
-        title: "Титаник",
-        poster: "https://m.media-amazon.com/images/M/MV5BMDdmZGU3NDQtY2E5My00ZTliLWIzOTUtMTY4ZGI1YjdiNjk3XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_FMjpg_UX1000_.jpg",
-        description: "Любовная история на фоне крушения легендарного лайнера.",
-        year: 1997,
-        director: "Джеймс Кэмерон",
-        actors: ["Леонардо ДиКаприo", "Кейт Уинслет", "Билли Зейн", "Кэти Бейтс"],
-        genre: ["Драма", "Романтика"],
-        rating: 7.9,
-        votes: 1250000
-    },
-    {
-        id: 9,
-        title: "Властелин колец: Братство Кольца",
-        poster: "https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_FMjpg_UX1000_.jpg",
-        description: "Фродо отправляется в опасное путешествие, чтобы уничтожить Кольцо Всевластья.",
-        year: 2001,
-        director: "Питер Джексон",
-        actors: ["Элайджа Вуд", "Иэн Маккеллен", "Вигго Мортенсен", "Шон Эстин"],
-        genre: ["Фэнтези", "Приключения"],
-        rating: 8.8,
-        votes: 1900000
-    },
-    {
-        id: 10,
-        title: "Криминальное чтиво",
-        poster: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg",
-        description: "Несколько переплетающихся историй о бандитах, боксёре и спасении мафиозного босса.",
-        year: 1994,
-        director: "Квентин Тарантино",
-        actors: ["Джон Траволта", "Сэмюэл Л. Джексон", "Ума Турман", "Брюс Уиллис"],
-        genre: ["Криминал", "Драма"],
-        rating: 8.9,
-        votes: 2100000
-    },
-    {
-        id: 11,
-        title: "Зелёная книга",
-        poster: "https://m.media-amazon.com/images/M/MV5BYzIzYmJlYTYtNGNiYy00N2EwLTk4ZjItMGYyZTJiOTVkM2RlXkEyXkFqcGdeQXVyODY1NDk1NjE@._V1_FMjpg_UX1000_.jpg",
-        description: "История дружбы афроамериканского пианиста и его итальянского водителя во времена сегрегации.",
-        year: 2018,
-        director: "Питер Фаррелли",
-        actors: ["Вигго Мортенсен", "Махершала Али", "Линда Карделлини", "Дон Старк"],
-        genre: ["Драма", "Комедия", "Биография"],
-        rating: 8.2,
-        votes: 520000
-    },
-    {
-        id: 12,
-        title: "Как приручить дракона",
-        poster: "https://m.media-amazon.com/images/M/MV5BMjA5NDQyMjc2NF5BMl5BanBnXkFtZTcwMjg5ODcyMw@@._V1_FMjpg_UX1000_.jpg",
-        description: "История дружбы мальчика Иккинга и дракона Беззубика, которая меняет жизнь всей деревни викингов.",
-        year: 2010,
-        director: "Дин ДеБлуа, Крис Сандерс",
-        actors: ["Джей Барушель", "Джерард Батлер", "Крэйг Фергюсон", "Америка Феррера"],
-        genre: ["Мультфильм", "Приключения", "Семейный"],
-        rating: 8.1,
-        votes: 760000
-    },
-    {
-        id: 13,
-        title: "Паразиты",
-        poster: "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_FMjpg_UX1000_.jpg",
-        description: "Бедная семья внедряется в жизнь богатых, что приводит к неожиданным последствиям.",
-        year: 2019,
-        director: "Пон Джун-хо",
-        actors: ["Сон Кан-хо", "Ли Сон-гюн", "Чо Ё-джон", "Чхве У-щик"],
-        genre: ["Триллер", "Драма", "Комедия"],
-        rating: 8.6,
-        votes: 850000
-    },
-    {
-        id: 14,
-        title: "Джокер",
-        poster: "https://m.media-amazon.com/images/M/MV5BNGVjNWI4ZGUtNzE0MS00YTJmLWE0ZDctN2ZiYTk2YmI3NTYyXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg",
-        description: "История превращения неудачливого комика в преступного гения.",
-        year: 2019,
-        director: "Тодд Филлипс",
-        actors: ["Хоакин Феникс", "Роберт Де Ниро", "Зэзи Битц", "Фрэнсис Конрой"],
-        genre: ["Триллер", "Драма", "Криминал"],
-        rating: 8.4,
-        votes: 1400000
-    },
-    {
-        id: 15,
-        title: "Аватар",
-        poster: "https://m.media-amazon.com/images/M/MV5BZDA0OGQxNTItMDZkMC00N2UyLTg3MzMtYTJmNjg3Nzk5MzRiXkEyXkFqcGdeQXVyMjUzOTY1NTc@._V1_FMjpg_UX1000_.jpg",
-        description: "Бывший морпех становится частью программы по освоению планеты Пандора.",
-        year: 2009,
-        director: "Джеймс Кэмерон",
-        actors: ["Сэм Уортингтон", "Зои Салдана", "Сигурни Уивер", "Стивен Лэнг"],
-        genre: ["Фантастика", "Приключения", "Боевик"],
-        rating: 7.8,
-        votes: 1350000
-    },
-    {
-        id: 16,
-        title: "Гладиатор",
-        poster: "https://m.media-amazon.com/images/M/MV5BMDliMmNhNDEtODUyOS00MjNlLTgxODEtN2U3NzIxMGVkZTA1L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_FMjpg_UX1000_.jpg",
-        description: "Преданный генерал становится гладиатором, чтобы отомстить за убийство семьи.",
-        year: 2000,
-        director: "Ридли Скотт",
-        actors: ["Рассел Кроу", "Хоакин Феникс", "Конни Нильсен", "Оливер Рид"],
-        genre: ["Боевик", "Драма", "Исторический"],
-        rating: 8.5,
-        votes: 1580000
-    },
-    {
-        id: 17,
-        title: "Бойцовский клуб",
-        poster: "https://m.media-amazon.com/images/M/MV5BMmEzNTkxYjQtZTc0MC00YTVjLTg5ZTEtZWMwOWVlYzY0NWIwXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg",
-        description: "Страдающий бессонницей офисный работник создаёт подпольный бойцовский клуб.",
-        year: 1999,
-        director: "Дэвид Финчер",
-        actors: ["Брэд Питт", "Эдвард Нортон", "Хелена Бонем Картер", "Мит Лоаф"],
-        genre: ["Драма", "Триллер"],
-        rating: 8.8,
-        votes: 2200000
-    },
-    {
-        id: 18,
-        title: "1+1",
-        poster: "https://m.media-amazon.com/images/M/MV5BMTYxNDA3MDQwNl5BMl5BanBnXkFtZTcwNTU4Mzc1Nw@@._V1_FMjpg_UX1000_.jpg",
-        description: "Богатый парализованный аристократ нанимает в помощники бывшего заключённого.",
-        year: 2011,
-        director: "Оливье Накаш",
-        actors: ["Франсуа Клюзе", "Омар Си", "Анн Ле Ни", "Одри Флёро"],
-        genre: ["Драма", "Комедия", "Биография"],
-        rating: 8.5,
-        votes: 890000
-    },
-    {
-        id: 19,
-        title: "Король Лев",
-        poster: "https://m.media-amazon.com/images/M/MV5BYTYxNGMyZTYtMjE3MS00MzNjLWFjNmYtMDk3N2FmM2JiM2M1XkEyXkFqcGdeQXVyNjY5NDU4NzI@._V1_FMjpg_UX1000_.jpg",
-        description: "Молодой львёнок Симба познаёт истинный смысл ответственности и чести.",
-        year: 1994,
-        director: "Роджер Аллерс",
-        actors: ["Мэттью Бродерик", "Джереми Айронс", "Джеймс Эрл Джон스", "Вупи Голдберг"],
-        genre: ["Мультфильм", "Мюзикл", "Драма"],
-        rating: 8.5,
-        votes: 1100000
-    },
-    {
-        id: 20,
-        title: "Остров проклятых",
-        poster: "https://m.media-amazon.com/images/M/MV5BYzQ0ZWIxZjAtYWI3Yy00MGM0LWFjOGYtNzcyYThiOTA3ODI1XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_FMjpg_UX1000_.jpg",
-        description: "Детектив расследует исчезновение пациентки психиатрической клиники на отдалённом острове.",
-        year: 2010,
-        director: "Мартин Скорсезе",
-        actors: ["Леонардо ДиКаприо", "Марк Руффало", "Бен Кингсли", "Мишель Уильямс"],
-        genre: ["Триллер", "Детектив", "Драма"],
-        rating: 8.2,
-        votes: 1450000
-    }
-];
+let movies = []; 
+let currentFilter = 'all';
+let currentSort = 'default';
+let searchTerm = '';
 
 class Cart {
     constructor() {
@@ -332,6 +94,119 @@ class RatingSystem {
 const cart = new Cart();
 const ratingSystem = new RatingSystem();
 
+async function loadLocalMovies() {
+    return [
+        {
+            id: "tt0111161",
+            title: "Побег из Шоушенка",
+            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Побег+из+Шоушенка",
+            description: "Два заключенных многие годы ищут способ обрести свободу.",
+            year: 1994,
+            director: "Фрэнк Дарабонт",
+            actors: ["Тим Роббинс", "Морган Фриман"],
+            genre: ["Драма", "Криминал"],
+            rating: 9.3,
+            votes: 2500000
+        },
+        {
+            id: "tt0068646",
+            title: "Крестный отец",
+            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Крестный+отец",
+            description: "История семьи мафиози Корлеоне.",
+            year: 1972,
+            director: "Фрэнсис Форд Коппола",
+            actors: ["Марлон Брандо", "Аль Пачино"],
+            genre: ["Криминал", "Драма"],
+            rating: 9.2,
+            votes: 1700000
+        },
+        {
+            id: "tt0468569",
+            title: "Темный рыцарь",
+            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Темный+рыцарь",
+            description: "Бэтмен сражается с Джокером.",
+            year: 2008,
+            director: "Кристофер Нолан",
+            actors: ["Кристиан Бейл", "Хит Леджер"],
+            genre: ["Боевик", "Криминал", "Драма"],
+            rating: 9.0,
+            votes: 2400000
+        },
+        {
+            id: "tt0109830",
+            title: "Форрест Гамп",
+            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Форрест+Гамп",
+            description: "История человека с низким IQ, который стал свидетелем ключевых событий истории Америки.",
+            year: 1994,
+            director: "Роберт Земекис",
+            actors: ["Том Хэнкс", "Робин Райт"],
+            genre: ["Драма", "Романтика"],
+            rating: 8.8,
+            votes: 1900000
+        },
+        {
+            id: "tt0167260",
+            title: "Властелин колец: Возвращение короля",
+            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Властелин+колец",
+            description: "Фродо и Сэм продолжают свой путь к Роковой Горе, чтобы уничтожить Кольцо Всевластия.",
+            year: 2003,
+            director: "Питер Джексон",
+            actors: ["Элайджа Вуд", "Вигго Мортенсен"],
+            genre: ["Фэнтези", "Приключения", "Драма"],
+            rating: 8.9,
+            votes: 1700000
+        },
+        {
+            id: "tttt0001",
+            title: "Брат",
+            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Брат",
+            description: "Демобилизованный Данила Багров пытается найти свое место в жизни в Санкт-Петербурге.",
+            year: 1997,
+            director: "Алексей Балабанов",
+            actors: ["Сергей Бодров", "Виктор Сухоруков"],
+            genre: ["Криминал", "Драма"],
+            rating: 8.3,
+            votes: 150000
+        },
+        {
+            id: "tttt0002",
+            title: "Ирония судьбы, или С легким паром!",
+            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Ирония+судьбы",
+            description: "Новогодняя история о том, как мужчина по ошибке попал в чужую квартиру.",
+            year: 1975,
+            director: "Эльдар Рязанов",
+            actors: ["Андрей Мягков", "Барбара Брыльска"],
+            genre: ["Комедия", "Мелодрама"],
+            rating: 8.5,
+            votes: 120000
+        },
+        {
+            id: "tttt0003",
+            title: "Легенда №17",
+            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Легенда+№17",
+            description: "Биографический фильм о хоккеисте Валерии Харламове.",
+            year: 2012,
+            director: "Николай Лебедев",
+            actors: ["Данила Козловский", "Светлана Иванова"],
+            genre: ["Биография", "Спорт", "Драма"],
+            rating: 7.9,
+            votes: 80000
+        }
+    ];
+}
+
+// Функция для поиска в локальной базе
+function searchLocalMovies(query) {
+    const searchTerm = query.toLowerCase().trim();
+    return movies.filter(movie => 
+        movie.title && movie.title.toLowerCase().includes(searchTerm) ||
+        movie.description && movie.description.toLowerCase().includes(searchTerm) ||
+        movie.director && movie.director.toLowerCase().includes(searchTerm) ||
+        movie.actors && movie.actors.some(actor => actor.toLowerCase().includes(searchTerm)) ||
+        movie.genre && movie.genre.some(genre => genre.toLowerCase().includes(searchTerm))
+    );
+}
+
 async function searchMovies(query) {
     try {
         const url = `${BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(query)}&type=movie`;
@@ -344,7 +219,6 @@ async function searchMovies(query) {
         const data = await response.json();
         
         if (data.Response === 'True') {
-        
             const detailedMovies = await Promise.all(
                 data.Search.slice(0, 10).map(async (movie) => {
                     return await getMovieDetails(movie.imdbID);
@@ -352,11 +226,11 @@ async function searchMovies(query) {
             );
             return detailedMovies.filter(movie => movie !== null);
         } else {
-            return [];
+            return searchLocalMovies(query);
         }
     } catch (error) {
         console.error('Ошибка поиска фильмов:', error);
-        throw new Error('Сервер недоступен. Попробуйте позже.');
+        return searchLocalMovies(query);
     }
 }
 
@@ -374,13 +248,13 @@ async function getMovieDetails(imdbID) {
         if (data.Response === 'True') {
             return {
                 id: data.imdbID,
-                title: data.Title,
+                title: data.Title || 'Без названия',
                 poster: data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/300x450/2c3e50/ffffff?text=No+Image',
-                description: data.Plot,
+                description: data.Plot || 'Описание отсутствует',
                 year: parseInt(data.Year) || new Date().getFullYear(),
-                director: data.Director,
+                director: data.Director || 'Не указан',
                 actors: data.Actors ? data.Actors.split(', ') : [],
-                genre: data.Genre ? data.Genre.split(', ') : [],
+                genre: data.Genre ? data.Genre.split(', ') : ['Не указан'],
                 rating: parseFloat(data.imdbRating) || 0,
                 votes: parseInt(data.imdbVotes?.replace(/,/g, '')) || 0
             };
@@ -394,10 +268,11 @@ async function getMovieDetails(imdbID) {
 
 async function getPopularMovies() {
     try {
-        
-        const popularQueries = ['avengers', 'batman', 'star wars', 'harry potter', 'lord of the rings'];
+        const popularQueries = [
+            'avengers', 'batman', 'star wars', 'harry potter', 'lord of the rings',
+            'марвел', 'бэтмен', 'звездные войны', 'гарри поттер', 'властелин колец'
+        ];
         const randomQuery = popularQueries[Math.floor(Math.random() * popularQueries.length)];
-        
         return await searchMovies(randomQuery);
     } catch (error) {
         console.error('Ошибка загрузки популярных фильмов:', error);
@@ -446,16 +321,16 @@ function showCartModal() {
         if (items.length === 0) {
             cartItems.innerHTML = '<p>Корзина пуста</p>';
         } else {
-            cartItems.innerHTML = items.map(movieId => {
-                const movie = movies.find(m => m.id === movieId);
-                return movie ? `
-                    <div class="cart-item">
-                        <span>${movie.title}</span>
-                        <button class="remove-from-cart" data-id="${movie.id}">Удалить</button>
-                    </div>
-                ` : '';
-            }).join('');
+            const cartMovies = items.map(movieId => 
+                movies.find(m => m.id === movieId)
+            ).filter(movie => movie !== undefined);
             
+            cartItems.innerHTML = cartMovies.map(movie => `
+                <div class="cart-item">
+                    <span>${movie.title}</span>
+                    <button class="remove-from-cart" data-id="${movie.id}">Удалить</button>
+                </div>
+            `).join('');
             document.querySelectorAll('.remove-from-cart').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const movieId = btn.dataset.id;
@@ -503,7 +378,7 @@ function renderMovies(moviesToRender) {
             <h2>${movie.title}</h2>
             <div class="movie-meta">
                 <span class="year">${movie.year}</span>
-                <span class="genre">${movie.genre.join(', ')}</span>
+                <span class="genre">${movie.genre ? movie.genre.join(', ') : 'Не указан'}</span>
             </div>
             <p>${movie.description ? movie.description.substring(0, 100) + '...' : 'Описание отсутствует'}</p>
             <div class="rating">
@@ -542,6 +417,68 @@ function renderMovies(moviesToRender) {
     });
 }
 
+function filterAndSortMovies() {
+    let filtered = [...movies]; 
+    
+    if (filtered.length === 0) {
+        renderMovies([]);
+        return;
+    }
+    
+    if (currentFilter !== 'all') {
+        filtered = filtered.filter(movie => {
+            if (!movie.genre || !Array.isArray(movie.genre)) return false;
+            
+            const movieGenres = movie.genre.map(g => g.toLowerCase().trim());
+            
+            const genreMap = {
+                'фантастика': ['фантастика', 'fantasy', 'sci-fi', 'science fiction'],
+                'боевик': ['боевик', 'action', 'экшн'],
+                'драма': ['драма', 'drama'],
+                'комедия': ['комедия', 'comedy'],
+                'триллер': ['триллер', 'thriller'],
+                'криминал': ['криминал', 'crime', 'криминальный'],
+                'приключения': ['приключения', 'adventure'],
+                'мультфильм': ['мультфильм', 'animation', 'animated', 'cartoon'],
+                'биография': ['биография', 'biography', 'biographical'],
+                'исторический': ['исторический', 'history', 'historical']
+            };
+            
+            const targetGenres = genreMap[currentFilter] || [currentFilter];
+            
+            return movieGenres.some(movieGenre => 
+                targetGenres.some(targetGenre => movieGenre.includes(targetGenre))
+            );
+        });
+    }
+    
+    if (searchTerm) {
+        filtered = filtered.filter(movie => 
+            movie.title && movie.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }
+    
+    switch(currentSort) {
+        case 'rating-desc':
+            filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            break;
+        case 'rating-asc':
+            filtered.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+            break;
+        case 'title':
+            filtered.sort((a, b) => a.title.localeCompare(b.title));
+            break;
+        case 'year-desc':
+            filtered.sort((a, b) => (b.year || 0) - (a.year || 0));
+            break;
+        case 'year-asc':
+            filtered.sort((a, b) => (a.year || 0) - (b.year || 0));
+            break;
+    }
+    
+    renderMovies(filtered);
+}
+
 async function initMainPage() {
     const moviesContainer = document.getElementById('movies');
     const searchInput = document.getElementById('search');
@@ -552,9 +489,7 @@ async function initMainPage() {
         let currentFilter = 'all';
         let currentSort = 'default';
         let searchTerm = '';
-        let allMovies = [];
-        
-        
+       
         moviesContainer.innerHTML = `
             <div class="loading-container">
                 <div class="loading-spinner"></div>
@@ -563,32 +498,26 @@ async function initMainPage() {
         `;
         
         try {
+            movies = await getPopularMovies();
             
-            allMovies = await getPopularMovies();
-            
-            
-            if (allMovies.length === 0) {
-                allMovies = movies;
+            if (movies.length === 0) {
+                movies = await loadLocalMovies();
             }
             
             filterAndSortMovies();
         } catch (error) {
             console.error('Ошибка загрузки фильмов:', error);
-            
-            allMovies = movies;
+            movies = await loadLocalMovies();
             filterAndSortMovies();
-            
             
             const errorMessage = document.createElement('div');
             errorMessage.className = 'error-message';
-            errorMessage.innerHTML = `
-                <p>Упс! Сервер недоступен. Используем локальную базу фильмов.</p>
-            `;
+            errorMessage.innerHTML = `<p>Упс! Сервер недоступен. Используем локальную базу фильмов.</p>`;
             moviesContainer.parentNode.insertBefore(errorMessage, moviesContainer);
         }
         
         function filterAndSortMovies() {
-            let filtered = [...allMovies];
+            let filtered = [...movies]; 
             
             if (currentFilter !== 'all') {
                 filtered = filtered.filter(movie => 
@@ -625,13 +554,12 @@ async function initMainPage() {
             renderMovies(filtered);
         }
         
-    
         let searchTimeout;
         searchInput.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
             searchTerm = e.target.value.trim();
             
-            if (searchTerm.length > 2) {
+            if (searchTerm.length > 1) {
                 moviesContainer.innerHTML = `
                     <div class="loading-container">
                         <div class="loading-spinner"></div>
@@ -641,12 +569,21 @@ async function initMainPage() {
                 
                 searchTimeout = setTimeout(async () => {
                     try {
-                        const searchResults = await searchMovies(searchTerm);
-                        allMovies = searchResults.length > 0 ? searchResults : movies;
+                        let searchResults = await searchMovies(searchTerm);
+                        
+                        if (searchResults.length === 0) {
+                            searchResults = searchLocalMovies(searchTerm);
+                        }
+                        
+                        movies = searchResults.length > 0 ? searchResults : await loadLocalMovies();
                         filterAndSortMovies();
-                    } catch (error) {
+                    } 
+                    catch (error) {
                         console.error('Ошибка поиска:', error);
-                        allMovies = movies;
+                        movies = searchLocalMovies(searchTerm);
+                        if (movies.length === 0) {
+                            movies = await loadLocalMovies();
+                        }
                         filterAndSortMovies();
                         
                         const errorMessage = document.createElement('div');
@@ -654,7 +591,7 @@ async function initMainPage() {
                         errorMessage.innerHTML = `<p>Ошибка поиска: ${error.message}</p>`;
                         moviesContainer.parentNode.insertBefore(errorMessage, moviesContainer);
                     }
-                }, 500);
+                }, 400);
             } else if (searchTerm.length === 0) {
                 searchTimeout = setTimeout(async () => {
                     moviesContainer.innerHTML = `
@@ -665,11 +602,11 @@ async function initMainPage() {
                     `;
                     
                     try {
-                        allMovies = await getPopularMovies();
-                        if (allMovies.length === 0) allMovies = movies;
+                        movies = await getPopularMovies();
+                        if (movies.length === 0) movies = await loadLocalMovies();
                         filterAndSortMovies();
                     } catch (error) {
-                        allMovies = movies;
+                        movies = await loadLocalMovies();
                         filterAndSortMovies();
                     }
                 }, 300);
@@ -698,4 +635,159 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('movies')) {
         initMainPage();
     }
+    
+    if (document.getElementById('movieDetails')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const movieId = urlParams.get('id');
+        
+        if (!movieId) {
+            document.getElementById('movieDetails').innerHTML = `
+                <div class="movie-detail-card">
+                    <h2>Фильм не найден</h2>
+                    <p>Извините, ID фильма не указан.</p>
+                    <a href="index.html" class="back-btn">Вернуться на главную</a>
+                </div>
+            `;
+            return;
+        }
+        
+        loadMovieDetails(movieId);
+    }
 });
+
+async function loadMovieDetails(movieId) {
+    const movieDetails = document.getElementById('movieDetails');
+    
+    try {
+        movieDetails.innerHTML = `
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Загрузка информации о фильме...</p>
+            </div>
+        `;
+        
+        const movie = await getMovieDetails(movieId);
+        
+        if (movie) {
+            renderMovieDetails(movie);
+        } else {
+            throw new Error('Фильм не найден');
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки деталей фильма:', error);
+        movieDetails.innerHTML = `
+            <div class="movie-detail-card">
+                <h2>Ошибка загрузки</h2>
+                <p>${error.message}</p>
+                <a href="index.html" class="back-btn">Вернуться на главную</a>
+            </div>
+        `;
+    }
+}
+
+function renderMovieDetails(movie) {
+    const movieDetails = document.getElementById('movieDetails');
+    const hasRated = ratingSystem.hasRated(movie.id);
+    const userRating = ratingSystem.getRating(movie.id);
+    const isInCart = cart.isInCart(movie.id);
+
+    movieDetails.innerHTML = `
+        <div class="movie-detail-card">
+            <div class="movie-poster">
+                <img src="${movie.poster}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450/2c3e50/ffffff?text=No+Image'">
+            </div>
+            <div class="movie-info">
+                <h2>${movie.title} (${movie.year})</h2>
+                <p><strong>Режиссер:</strong> ${movie.director || 'Не указан'}</p>
+                <p><strong>Актеры:</strong> ${movie.actors ? movie.actors.join(', ') : 'Не указаны'}</p>
+                <p><strong>Жанр:</strong> ${movie.genre ? movie.genre.join(', ') : 'Не указан'}</p>
+                
+                <div class="rating">
+                    <p><strong>Рейтинг:</strong> 
+                        <span class="rating-value">★ ${movie.rating || 'N/A'}</span>
+                        <span> (${movie.votes ? movie.votes.toLocaleString() : 0} оценок)</span>
+                    </p>
+                </div>
+                
+                <p><strong>Описание:</strong> ${movie.description || 'Описание отсутствует'}</p>
+                
+                <div class="movie-actions">
+                    <button class="add-to-cart-btn ${isInCart ? 'added' : ''}" data-id="${movie.id}">
+                        ${isInCart ? '✓ В корзине' : '➕ Добавить в корзину'}
+                    </button>
+                    
+                    <div class="user-rating">
+                        <p><strong>Ваша оценка:</strong> 
+                            ${hasRated ? `<span class="rating-value">★ ${userRating}</span>` : 'Ещё не оценено'}
+                        </p>
+                        ${!hasRated ? `
+                            <div class="stars">
+                                ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(star => `
+                                    <span class="star" data-rating="${star}">★</span>
+                                `).join('')}
+                            </div>
+                            <small>Оцените от 1 до 10 звезд</small>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <a href="index.html" class="back-btn">← Назад к списку</a>
+            </div>
+        </div>
+    `;
+
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', () => {
+            const movieId = addToCartBtn.dataset.id;
+            if (cart.isInCart(movieId)) {
+                cart.removeFromCart(movieId);
+                addToCartBtn.textContent = '➕ Добавить в корзину';
+                addToCartBtn.classList.remove('added');
+            } else {
+                cart.addToCart(movieId);
+                addToCartBtn.textContent = '✓ В корзине';
+                addToCartBtn.classList.add('added');
+            }
+        });
+    }
+
+    if (!hasRated) {
+        const stars = document.querySelectorAll('.star');
+        let selectedRating = 0;
+
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const rating = parseInt(star.dataset.rating);
+                highlightStars(rating);
+            });
+
+            star.addEventListener('mouseout', () => {
+                highlightStars(selectedRating);
+            });
+
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.rating);
+                ratingSystem.setRating(movie.id, selectedRating);
+                
+                document.querySelector('.user-rating').innerHTML = `
+                    <p><strong>Ваша оценка:</strong> 
+                        <span class="rating-value">★ ${selectedRating}</span>
+                    </p>
+                    <p><small>Спасибо за оценку!</small></p>
+                `;
+            });
+        });
+
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                const starRating = parseInt(star.dataset.rating);
+                if (starRating <= rating) {
+                    star.style.color = '#ffc107';
+                } else {
+                    star.style.color = '#ccc';
+                }
+            });
+        }
+    }
+}
