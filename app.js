@@ -5,6 +5,9 @@ let movies = [];
 let currentFilter = 'all';
 let currentSort = 'default';
 let searchTerm = '';
+let currentPage = 1;
+let totalResults = 0;
+let isLoading = false;
 
 class Cart {
     constructor() {
@@ -91,156 +94,124 @@ class RatingSystem {
     }
 }
 
+class Favorites {
+    constructor() {
+        this.items = this.loadFavorites();
+    }
+
+    loadFavorites() {
+        const saved = localStorage.getItem('movieFavorites');
+        return saved ? JSON.parse(saved) : [];
+    }
+
+    saveFavorites() {
+        localStorage.setItem('movieFavorites', JSON.stringify(this.items));
+    }
+
+    addToFavorites(movieId) {
+        if (!this.items.includes(movieId)) {
+            this.items.push(movieId);
+            this.saveFavorites();
+            this.updateFavoriteButtons(movieId, true);
+            return true;
+        }
+        return false;
+    }
+
+    removeFromFavorites(movieId) {
+        this.items = this.items.filter(id => id !== movieId);
+        this.saveFavorites();
+        this.updateFavoriteButtons(movieId, false);
+    }
+
+    toggleFavorite(movieId) {
+        if (this.isFavorite(movieId)) {
+            this.removeFromFavorites(movieId);
+            return false;
+        } else {
+            this.addToFavorites(movieId);
+            return true;
+        }
+    }
+
+    getFavorites() {
+        return this.items;
+    }
+
+    isFavorite(movieId) {
+        return this.items.includes(movieId);
+    }
+
+    updateFavoriteButtons(movieId, isFavorite) {
+        const buttons = document.querySelectorAll(`.favorite-btn[data-id="${movieId}"]`);
+        buttons.forEach(btn => {
+            if (isFavorite) {
+                btn.innerHTML = '❤️';
+                btn.classList.add('favorited');
+                btn.title = 'Удалить из избранного';
+            } else {
+                btn.innerHTML = '🤍';
+                btn.classList.remove('favorited');
+                btn.title = 'Добавить в избранное';
+            }
+        });
+    }
+
+    getFavoriteMovies() {
+        return this.items.map(movieId => 
+            movies.find(m => m.id === movieId)
+        ).filter(movie => movie !== undefined);
+    }
+}
+
 const cart = new Cart();
 const ratingSystem = new RatingSystem();
+const favorites = new Favorites();
 
-async function loadLocalMovies() {
-    return [
-        {
-            id: "tt0111161",
-            title: "Побег из Шоушенка",
-            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Побег+из+Шоушенка",
-            description: "Два заключенных многие годы ищут способ обрести свободу.",
-            year: 1994,
-            director: "Фрэнк Дарабонт",
-            actors: ["Тим Роббинс", "Морган Фриман"],
-            genre: ["Драма", "Криминал"],
-            rating: 9.3,
-            votes: 2500000
-        },
-        {
-            id: "tt0068646",
-            title: "Крестный отец",
-            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Крестный+отец",
-            description: "История семьи мафиози Корлеоне.",
-            year: 1972,
-            director: "Фрэнсис Форд Коппола",
-            actors: ["Марлон Брандо", "Аль Пачино"],
-            genre: ["Криминал", "Драма"],
-            rating: 9.2,
-            votes: 1700000
-        },
-        {
-            id: "tt0468569",
-            title: "Темный рыцарь",
-            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Темный+рыцарь",
-            description: "Бэтмен сражается с Джокером.",
-            year: 2008,
-            director: "Кристофер Нолан",
-            actors: ["Кристиан Бейл", "Хит Леджер"],
-            genre: ["Боевик", "Криминал", "Драма"],
-            rating: 9.0,
-            votes: 2400000
-        },
-        {
-            id: "tt0109830",
-            title: "Форрест Гамп",
-            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Форрест+Гамп",
-            description: "История человека с низким IQ, который стал свидетелем ключевых событий истории Америки.",
-            year: 1994,
-            director: "Роберт Земекис",
-            actors: ["Том Хэнкс", "Робин Райт"],
-            genre: ["Драма", "Романтика"],
-            rating: 8.8,
-            votes: 1900000
-        },
-        {
-            id: "tt0167260",
-            title: "Властелин колец: Возвращение короля",
-            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Властелин+колец",
-            description: "Фродо и Сэм продолжают свой путь к Роковой Горе, чтобы уничтожить Кольцо Всевластия.",
-            year: 2003,
-            director: "Питер Джексон",
-            actors: ["Элайджа Вуд", "Вигго Мортенсен"],
-            genre: ["Фэнтези", "Приключения", "Драма"],
-            rating: 8.9,
-            votes: 1700000
-        },
-        {
-            id: "tttt0001",
-            title: "Брат",
-            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Брат",
-            description: "Демобилизованный Данила Багров пытается найти свое место в жизни в Санкт-Петербурге.",
-            year: 1997,
-            director: "Алексей Балабанов",
-            actors: ["Сергей Бодров", "Виктор Сухоруков"],
-            genre: ["Криминал", "Драма"],
-            rating: 8.3,
-            votes: 150000
-        },
-        {
-            id: "tttt0002",
-            title: "Ирония судьбы, или С легким паром!",
-            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Ирония+судьбы",
-            description: "Новогодняя история о том, как мужчина по ошибке попал в чужую квартиру.",
-            year: 1975,
-            director: "Эльдар Рязанов",
-            actors: ["Андрей Мягков", "Барбара Брыльска"],
-            genre: ["Комедия", "Мелодрама"],
-            rating: 8.5,
-            votes: 120000
-        },
-        {
-            id: "tttt0003",
-            title: "Легенда №17",
-            poster: "https://via.placeholder.com/300x450/2c3e50/ffffff?text=Легенда+№17",
-            description: "Биографический фильм о хоккеисте Валерии Харламове.",
-            year: 2012,
-            director: "Николай Лебедев",
-            actors: ["Данила Козловский", "Светлана Иванова"],
-            genre: ["Биография", "Спорт", "Драма"],
-            rating: 7.9,
-            votes: 80000
-        }
-    ];
-}
-
-// Функция для поиска в локальной базе
-function searchLocalMovies(query) {
-    const searchTerm = query.toLowerCase().trim();
-    return movies.filter(movie => 
-        movie.title && movie.title.toLowerCase().includes(searchTerm) ||
-        movie.description && movie.description.toLowerCase().includes(searchTerm) ||
-        movie.director && movie.director.toLowerCase().includes(searchTerm) ||
-        movie.actors && movie.actors.some(actor => actor.toLowerCase().includes(searchTerm)) ||
-        movie.genre && movie.genre.some(genre => genre.toLowerCase().includes(searchTerm))
-    );
-}
-
-async function searchMovies(query) {
+async function searchMovies(query, page = 1) {
     try {
-        const url = `${BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(query)}&type=movie`;
+        if (!query || query.trim().length < 2) {
+            throw new Error('Введите хотя бы 2 символа для поиска');
+        }
+
+        const url = `${BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(query)}&type=movie&page=${page}`;
         const response = await fetch(url);
         
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`Ошибка сети: ${response.status}`);
         }
         
         const data = await response.json();
         
         if (data.Response === 'True') {
-            const detailedMovies = await Promise.all(
-                data.Search.slice(0, 10).map(async (movie) => {
-                    return await getMovieDetails(movie.imdbID);
-                })
-            );
-            return detailedMovies.filter(movie => movie !== null);
+            totalResults = parseInt(data.totalResults);
+            
+            const moviePromises = data.Search.slice(0, 8).map(async (movie) => {
+                return await getMovieDetails(movie.imdbID);
+            });
+            
+            const detailedMovies = await Promise.all(moviePromises);
+            return {
+                movies: detailedMovies.filter(movie => movie !== null),
+                totalResults: totalResults,
+                hasMore: (page * 10) < totalResults
+            };
         } else {
-            return searchLocalMovies(query);
+            throw new Error(data.Error || 'Фильмы не найдены');
         }
     } catch (error) {
         console.error('Ошибка поиска фильмов:', error);
-        return searchLocalMovies(query);
+        throw error;
     }
 }
 
 async function getMovieDetails(imdbID) {
     try {
-        const url = `${BASE_URL}?apikey=${API_KEY}&i=${imdbID}&plot=full`;
+        const url = `${BASE_URL}?apikey=${API_KEY}&i=${imdbID}&plot=short`;
         const response = await fetch(url);
         
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`Ошибка загрузки: ${response.status}`);
         }
         
         const data = await response.json();
@@ -266,17 +237,79 @@ async function getMovieDetails(imdbID) {
     }
 }
 
-async function getPopularMovies() {
+async function getPopularMovies(page = 1) {
     try {
-        const popularQueries = [
-            'avengers', 'batman', 'star wars', 'harry potter', 'lord of the rings',
-            'марвел', 'бэтмен', 'звездные войны', 'гарри поттер', 'властелин колец'
-        ];
+        const popularQueries = ['avengers', 'batman', 'marvel', 'disney', 'action'];
         const randomQuery = popularQueries[Math.floor(Math.random() * popularQueries.length)];
-        return await searchMovies(randomQuery);
+        return await searchMovies(randomQuery, page);
     } catch (error) {
         console.error('Ошибка загрузки популярных фильмов:', error);
-        return [];
+        throw error;
+    }
+}
+
+async function loadNextPage() {
+    if (isLoading) return;
+    
+    isLoading = true;
+    const moviesContainer = document.getElementById('movies');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    
+    if (loadMoreBtn) {
+        loadMoreBtn.innerHTML = '<div class="loading-spinner small"></div> Загрузка...';
+        loadMoreBtn.disabled = true;
+    }
+    
+    try {
+        currentPage++;
+        let result;
+        
+        if (searchTerm) {
+            result = await searchMovies(searchTerm, currentPage);
+        } else {
+            result = await getPopularMovies(currentPage);
+        }
+        
+        if (result.movies && result.movies.length > 0) {
+            movies = [...movies, ...result.movies];
+            filterAndSortMovies();
+            updateLoadMoreButton(result.hasMore);
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки следующей страницы:', error);
+        showError(`Ошибка загрузки: ${error.message}`);
+        currentPage--;
+    } finally {
+        isLoading = false;
+    }
+}
+
+function updateLoadMoreButton(hasMore) {
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    
+    if (!loadMoreContainer) return;
+    
+    if (hasMore) {
+        if (!loadMoreBtn) {
+            loadMoreContainer.innerHTML = `
+                <button id="loadMoreBtn" class="load-more-btn">
+                    📺 Загрузить еще фильмы
+                </button>
+            `;
+            
+            document.getElementById('loadMoreBtn').addEventListener('click', loadNextPage);
+        } else {
+            loadMoreBtn.innerHTML = '📺 Загрузить еще фильмы';
+            loadMoreBtn.disabled = false;
+        }
+    } else {
+        loadMoreContainer.innerHTML = `
+            <div class="no-more-results">
+                <p>🎬 Все фильмы загружены!</p>
+                <small>Найдено всего: ${totalResults} фильмов</small>
+            </div>
+        `;
     }
 }
 
@@ -319,30 +352,63 @@ function showCartModal() {
     if (cartItems) {
         const items = cart.getItems();
         if (items.length === 0) {
-            cartItems.innerHTML = '<p>Корзина пуста</p>';
+            cartItems.innerHTML = '<p class="empty-cart">Корзина пуста</p>';
         } else {
             const cartMovies = items.map(movieId => 
                 movies.find(m => m.id === movieId)
             ).filter(movie => movie !== undefined);
             
             cartItems.innerHTML = cartMovies.map(movie => `
-                <div class="cart-item">
-                    <span>${movie.title}</span>
-                    <button class="remove-from-cart" data-id="${movie.id}">Удалить</button>
+                <div class="cart-item" data-id="${movie.id}">
+                    <span class="cart-item-title">${movie.title}</span>
+                    <div class="cart-item-actions">
+                        <button class="view-movie-btn" data-id="${movie.id}">👁️</button>
+                        <button class="remove-from-cart" data-id="${movie.id}">Удалить</button>
+                    </div>
                 </div>
             `).join('');
+            
+            document.querySelectorAll('.view-movie-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const movieId = btn.dataset.id;
+                    viewMovieFromCart(movieId);
+                });
+            });
+            
             document.querySelectorAll('.remove-from-cart').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const movieId = btn.dataset.id;
                     cart.removeFromCart(movieId);
                     showCartModal();
                     updateCartButtons(movieId, false);
                 });
             });
+            
+            document.querySelectorAll('.cart-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (!e.target.closest('.cart-item-actions')) {
+                        const movieId = item.dataset.id;
+                        viewMovieFromCart(movieId);
+                    }
+                });
+            });
         }
     }
     
     modal.style.display = 'block';
+}
+
+function viewMovieFromCart(movieId) {
+    const modal = document.getElementById('cartModal');
+    modal.style.display = 'none';
+    
+    if (window.location.pathname.includes('movie.html')) {
+        loadMovieDetails(movieId);
+    } else {
+        window.location.href = `movie.html?id=${movieId}`;
+    }
 }
 
 function updateCartButtons(movieId, isInCart) {
@@ -360,20 +426,36 @@ function updateCartButtons(movieId, isInCart) {
 
 function renderMovies(moviesToRender) {
     const moviesContainer = document.getElementById('movies');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    
     if (!moviesContainer) return;
     
     moviesContainer.innerHTML = '';
     
     if (moviesToRender.length === 0) {
-        moviesContainer.innerHTML = '<div class="no-results">Фильмы не найдены</div>';
+        moviesContainer.innerHTML = `
+            <div class="no-results">
+                <h3>Фильмы не найдены</h3>
+                <p>Попробуйте изменить поисковый запрос или фильтры</p>
+            </div>
+        `;
+        if (loadMoreContainer) {
+            loadMoreContainer.innerHTML = '';
+        }
         return;
     }
     
     moviesToRender.forEach(movie => {
         const isInCart = cart.isInCart(movie.id);
+        const isFavorite = favorites.isFavorite(movie.id);
         const movieEl = document.createElement('div');
         movieEl.className = 'movie';
         movieEl.innerHTML = `
+            <div class="movie-header">
+                <button class="favorite-btn ${isFavorite ? 'favorited' : ''}" data-id="${movie.id}" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}">
+                    ${isFavorite ? '❤️' : '🤍'}
+                </button>
+            </div>
             <img src="${movie.poster}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/280x400/2c3e50/ffffff?text=No+Image'">
             <h2>${movie.title}</h2>
             <div class="movie-meta">
@@ -406,48 +488,33 @@ function renderMovies(moviesToRender) {
             const movieId = btn.dataset.id;
             if (cart.isInCart(movieId)) {
                 cart.removeFromCart(movieId);
-                btn.textContent = '➕ В корзину';
-                btn.classList.remove('added');
+                updateCartButtons(movieId, false);
             } else {
                 cart.addToCart(movieId);
-                btn.textContent = '✓ В корзине';
-                btn.classList.add('added');
+                updateCartButtons(movieId, true);
             }
+        });
+    });
+
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const movieId = btn.dataset.id;
+            favorites.toggleFavorite(movieId);
         });
     });
 }
 
 function filterAndSortMovies() {
-    let filtered = [...movies]; 
+    let filtered = [...movies];
     
-    if (filtered.length === 0) {
-        renderMovies([]);
-        return;
-    }
-    
-    if (currentFilter !== 'all') {
+    if (currentFilter === 'favorites') {
+        filtered = favorites.getFavoriteMovies();
+    } else if (currentFilter !== 'all') {
         filtered = filtered.filter(movie => {
             if (!movie.genre || !Array.isArray(movie.genre)) return false;
-            
-            const movieGenres = movie.genre.map(g => g.toLowerCase().trim());
-            
-            const genreMap = {
-                'фантастика': ['фантастика', 'fantasy', 'sci-fi', 'science fiction'],
-                'боевик': ['боевик', 'action', 'экшн'],
-                'драма': ['драма', 'drama'],
-                'комедия': ['комедия', 'comedy'],
-                'триллер': ['триллер', 'thriller'],
-                'криминал': ['криминал', 'crime', 'криминальный'],
-                'приключения': ['приключения', 'adventure'],
-                'мультфильм': ['мультфильм', 'animation', 'animated', 'cartoon'],
-                'биография': ['биография', 'biography', 'biographical'],
-                'исторический': ['исторический', 'history', 'historical']
-            };
-            
-            const targetGenres = genreMap[currentFilter] || [currentFilter];
-            
-            return movieGenres.some(movieGenre => 
-                targetGenres.some(targetGenre => movieGenre.includes(targetGenre))
+            return movie.genre.some(genre => 
+                genre.toLowerCase().includes(currentFilter.toLowerCase())
             );
         });
     }
@@ -477,183 +544,132 @@ function filterAndSortMovies() {
     }
     
     renderMovies(filtered);
+    
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    if (loadMoreContainer) {
+        if (currentFilter === 'favorites') {
+            loadMoreContainer.innerHTML = `
+                <div class="favorites-info">
+                    <p>❤️ В избранном: ${filtered.length} фильмов</p>
+                </div>
+            `;
+        } else {
+            updateLoadMoreButton((currentPage * 10) < totalResults);
+        }
+    }
+}
+
+function showError(message) {
+    const moviesContainer = document.getElementById('movies');
+    if (moviesContainer) {
+        moviesContainer.innerHTML = `
+            <div class="error-message">
+                <h3>Ошибка</h3>
+                <p>${message}</p>
+                <button onclick="loadDefaultMovies()" class="retry-btn">Попробовать снова</button>
+            </div>
+        `;
+    }
+}
+
+async function loadDefaultMovies() {
+    const moviesContainer = document.getElementById('movies');
+    if (!moviesContainer) return;
+    
+    currentPage = 1;
+    totalResults = 0;
+    
+    moviesContainer.innerHTML = `
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Загрузка популярных фильмов...</p>
+        </div>
+    `;
+    
+    try {
+        const result = await getPopularMovies(currentPage);
+        movies = result.movies;
+        totalResults = result.totalResults;
+        
+        filterAndSortMovies();
+        updateLoadMoreButton(result.hasMore);
+    } catch (error) {
+        showError(`Не удалось загрузить фильмы: ${error.message}`);
+    }
 }
 
 async function initMainPage() {
-    const moviesContainer = document.getElementById('movies');
     const searchInput = document.getElementById('search');
     const genreButtons = document.querySelectorAll('.filter-btn');
     const sortSelect = document.getElementById('sortSelect');
     
-    if (moviesContainer && searchInput) {
-        let currentFilter = 'all';
-        let currentSort = 'default';
-        let searchTerm = '';
-       
-        moviesContainer.innerHTML = `
-            <div class="loading-container">
-                <div class="loading-spinner"></div>
-                <p class="loading-text">Загрузка фильмов...</p>
-            </div>
-        `;
-        
-        try {
-            movies = await getPopularMovies();
-            
-            if (movies.length === 0) {
-                movies = await loadLocalMovies();
-            }
-            
-            filterAndSortMovies();
-        } catch (error) {
-            console.error('Ошибка загрузки фильмов:', error);
-            movies = await loadLocalMovies();
-            filterAndSortMovies();
-            
-            const errorMessage = document.createElement('div');
-            errorMessage.className = 'error-message';
-            errorMessage.innerHTML = `<p>Упс! Сервер недоступен. Используем локальную базу фильмов.</p>`;
-            moviesContainer.parentNode.insertBefore(errorMessage, moviesContainer);
-        }
-        
-        function filterAndSortMovies() {
-            let filtered = [...movies]; 
-            
-            if (currentFilter !== 'all') {
-                filtered = filtered.filter(movie => 
-                    movie.genre && movie.genre.some(g => 
-                        g.toLowerCase().includes(currentFilter.toLowerCase())
-                    )
-                );
-            }
-            
-            if (searchTerm) {
-                filtered = filtered.filter(movie => 
-                    movie.title && movie.title.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-            }
-            
-            switch(currentSort) {
-                case 'rating-desc':
-                    filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-                    break;
-                case 'rating-asc':
-                    filtered.sort((a, b) => (a.rating || 0) - (b.rating || 0));
-                    break;
-                case 'title':
-                    filtered.sort((a, b) => a.title.localeCompare(b.title));
-                    break;
-                case 'year-desc':
-                    filtered.sort((a, b) => (b.year || 0) - (a.year || 0));
-                    break;
-                case 'year-asc':
-                    filtered.sort((a, b) => (a.year || 0) - (b.year || 0));
-                    break;
-            }
-            
-            renderMovies(filtered);
-        }
-        
-        let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTerm = e.target.value.trim();
-            
-            if (searchTerm.length > 1) {
-                moviesContainer.innerHTML = `
-                    <div class="loading-container">
-                        <div class="loading-spinner"></div>
-                        <p class="loading-text">Поиск...</p>
-                    </div>
-                `;
-                
-                searchTimeout = setTimeout(async () => {
-                    try {
-                        let searchResults = await searchMovies(searchTerm);
-                        
-                        if (searchResults.length === 0) {
-                            searchResults = searchLocalMovies(searchTerm);
-                        }
-                        
-                        movies = searchResults.length > 0 ? searchResults : await loadLocalMovies();
-                        filterAndSortMovies();
-                    } 
-                    catch (error) {
-                        console.error('Ошибка поиска:', error);
-                        movies = searchLocalMovies(searchTerm);
-                        if (movies.length === 0) {
-                            movies = await loadLocalMovies();
-                        }
-                        filterAndSortMovies();
-                        
-                        const errorMessage = document.createElement('div');
-                        errorMessage.className = 'error-message';
-                        errorMessage.innerHTML = `<p>Ошибка поиска: ${error.message}</p>`;
-                        moviesContainer.parentNode.insertBefore(errorMessage, moviesContainer);
-                    }
-                }, 400);
-            } else if (searchTerm.length === 0) {
-                searchTimeout = setTimeout(async () => {
-                    moviesContainer.innerHTML = `
-                        <div class="loading-container">
-                            <div class="loading-spinner"></div>
-                            <p class="loading-text">Загрузка...</p>
-                        </div>
-                    `;
-                    
-                    try {
-                        movies = await getPopularMovies();
-                        if (movies.length === 0) movies = await loadLocalMovies();
-                        filterAndSortMovies();
-                    } catch (error) {
-                        movies = await loadLocalMovies();
-                        filterAndSortMovies();
-                    }
-                }, 300);
-            }
-        });
-        
-        genreButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                genreButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.dataset.filter;
-                filterAndSortMovies();
-            });
-        });
-        
-        sortSelect.addEventListener('change', (e) => {
-            currentSort = e.target.value;
-            filterAndSortMovies();
-        });
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    setupModal();
+    if (!searchInput) return;
     
-    if (document.getElementById('movies')) {
-        initMainPage();
+    const moviesContainer = document.getElementById('movies');
+    if (moviesContainer) {
+        const loadMoreContainer = document.createElement('div');
+        loadMoreContainer.id = 'loadMoreContainer';
+        loadMoreContainer.className = 'load-more-container';
+        moviesContainer.parentNode.appendChild(loadMoreContainer);
     }
     
-    if (document.getElementById('movieDetails')) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const movieId = urlParams.get('id');
+    await loadDefaultMovies();
+    
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTerm = e.target.value.trim();
         
-        if (!movieId) {
-            document.getElementById('movieDetails').innerHTML = `
-                <div class="movie-detail-card">
-                    <h2>Фильм не найден</h2>
-                    <p>Извините, ID фильма не указан.</p>
-                    <a href="index.html" class="back-btn">Вернуться на главную</a>
+        if (searchTerm.length > 1) {
+            const moviesContainer = document.getElementById('movies');
+            moviesContainer.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Поиск фильмов...</p>
                 </div>
             `;
-            return;
+            
+            searchTimeout = setTimeout(async () => {
+                try {
+                    currentPage = 1;
+                    const result = await searchMovies(searchTerm, currentPage);
+                    movies = result.movies;
+                    totalResults = result.totalResults;
+                    
+                    filterAndSortMovies();
+                    if (currentFilter !== 'favorites') {
+                        updateLoadMoreButton(result.hasMore);
+                    }
+                } catch (error) {
+                    showError(error.message);
+                }
+            }, 500);
+        } else if (searchTerm.length === 0) {
+            searchTimeout = setTimeout(() => {
+                loadDefaultMovies();
+            }, 300);
         }
-        
-        loadMovieDetails(movieId);
-    }
-});
+    });
+    
+    genreButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            genreButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            
+            if (currentFilter === 'favorites') {
+                filterAndSortMovies();
+            } else {
+                filterAndSortMovies();
+            }
+        });
+    });
+    
+    sortSelect.addEventListener('change', (e) => {
+        currentSort = e.target.value;
+        filterAndSortMovies();
+    });
+}
 
 async function loadMovieDetails(movieId) {
     const movieDetails = document.getElementById('movieDetails');
@@ -671,12 +687,12 @@ async function loadMovieDetails(movieId) {
         if (movie) {
             renderMovieDetails(movie);
         } else {
-            throw new Error('Фильм не найден');
+            throw new Error('Фильм не найден в базе данных');
         }
     } catch (error) {
         console.error('Ошибка загрузки деталей фильма:', error);
         movieDetails.innerHTML = `
-            <div class="movie-detail-card">
+            <div class="error-message">
                 <h2>Ошибка загрузки</h2>
                 <p>${error.message}</p>
                 <a href="index.html" class="back-btn">Вернуться на главную</a>
@@ -690,14 +706,22 @@ function renderMovieDetails(movie) {
     const hasRated = ratingSystem.hasRated(movie.id);
     const userRating = ratingSystem.getRating(movie.id);
     const isInCart = cart.isInCart(movie.id);
+    const isFavorite = favorites.isFavorite(movie.id);
 
     movieDetails.innerHTML = `
         <div class="movie-detail-card">
             <div class="movie-poster">
                 <img src="${movie.poster}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450/2c3e50/ffffff?text=No+Image'">
+                ${isInCart ? '<div class="in-cart-badge">В корзине</div>' : ''}
+                ${isFavorite ? '<div class="favorite-badge">❤️ Избранное</div>' : ''}
             </div>
             <div class="movie-info">
-                <h2>${movie.title} (${movie.year})</h2>
+                <div class="movie-header-detail">
+                    <h2>${movie.title} (${movie.year})</h2>
+                    <button class="favorite-btn-detail ${isFavorite ? 'favorited' : ''}" data-id="${movie.id}" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}">
+                        ${isFavorite ? '❤️' : '🤍'}
+                    </button>
+                </div>
                 <p><strong>Режиссер:</strong> ${movie.director || 'Не указан'}</p>
                 <p><strong>Актеры:</strong> ${movie.actors ? movie.actors.join(', ') : 'Не указаны'}</p>
                 <p><strong>Жанр:</strong> ${movie.genre ? movie.genre.join(', ') : 'Не указан'}</p>
@@ -714,6 +738,10 @@ function renderMovieDetails(movie) {
                 <div class="movie-actions">
                     <button class="add-to-cart-btn ${isInCart ? 'added' : ''}" data-id="${movie.id}">
                         ${isInCart ? '✓ В корзине' : '➕ Добавить в корзину'}
+                    </button>
+                    
+                    <button class="back-to-cart-btn" onclick="showCartModal()">
+                        🛒 Вернуться к корзине
                     </button>
                     
                     <div class="user-rating">
@@ -748,6 +776,21 @@ function renderMovieDetails(movie) {
                 cart.addToCart(movieId);
                 addToCartBtn.textContent = '✓ В корзине';
                 addToCartBtn.classList.add('added');
+            }
+        });
+    }
+
+    const favoriteBtn = document.querySelector('.favorite-btn-detail');
+    if (favoriteBtn) {
+        favoriteBtn.addEventListener('click', () => {
+            const movieId = favoriteBtn.dataset.id;
+            const isNowFavorite = favorites.toggleFavorite(movieId);
+            
+            const favoriteBadge = document.querySelector('.favorite-badge');
+            if (isNowFavorite && !favoriteBadge) {
+                document.querySelector('.movie-poster').innerHTML += '<div class="favorite-badge">❤️ Избранное</div>';
+            } else if (!isNowFavorite && favoriteBadge) {
+                favoriteBadge.remove();
             }
         });
     }
@@ -791,3 +834,31 @@ function renderMovieDetails(movie) {
         }
     }
 }
+
+window.loadDefaultMovies = loadDefaultMovies;
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupModal();
+    
+    if (document.getElementById('movies')) {
+        initMainPage();
+    }
+    
+    if (document.getElementById('movieDetails')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const movieId = urlParams.get('id');
+        
+        if (!movieId) {
+            document.getElementById('movieDetails').innerHTML = `
+                <div class="error-message">
+                    <h2>Фильм не найден</h2>
+                    <p>ID фильма не указан в URL</p>
+                    <a href="index.html" class="back-btn">Вернуться на главную</a>
+                </div>
+            `;
+            return;
+        }
+        
+        loadMovieDetails(movieId);
+    }
+});
